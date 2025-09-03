@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
+@CrossOrigin(origins = "exp://172.17.4.82:8081")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -23,6 +24,14 @@ public class AuthController {
         log.info("AuthController.login()...");
         return auth.register(credential);
     }
+
+    @PostMapping("/test")
+    public ResponseEntity<?> test() {
+        log.info("AuthController.test()...");
+        return ResponseEntity.ok("Test successful");
+    }
+
+
 
     @PostMapping("/login")
     //@PreAuthorize("permitAll()")
