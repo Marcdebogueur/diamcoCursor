@@ -4,6 +4,7 @@ import com.diamco.v1.entities.Utilisateur;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+@Slf4j
 @Component
 public class JwtUtils {
 
@@ -67,7 +69,9 @@ public class JwtUtils {
     }
 
     public String extractRole(String token) {
-        return extractAllClaims(token).get("role", String.class);
+        String role = extractAllClaims(token).get("role", String.class);
+        log.info("Role extrait du token: {}", role); // Ajoutez ce log
+        return role;
     }
 
     public String extractEmail(String token) {

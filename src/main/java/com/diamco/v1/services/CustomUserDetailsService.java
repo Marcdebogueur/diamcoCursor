@@ -29,6 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Utilisateur non trouvé avec l'email: " + email);
         }
         log.info("Connexion utilisateur : {}", user.getEmail());
+        log.info("Rôle utilisateur : {}", user.getRole()); // Ajoutez ce log
 
         return new User(
                 user.getEmail(), // ✅ toujours l'email comme username
