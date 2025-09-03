@@ -29,14 +29,16 @@ public class AuthService implements IAuth{
     private final AuthenticationManager authenticationManager;
     private final UtilisateurRepository userRepository;
 
+    @Override
     public ResponseEntity<?> register(Utilisateur credential) {
         if (userRepository.findByNom(credential.getNom()) != null || userRepository.findByEmail(credential.getEmail()) != null) {
-            return ResponseEntity.badRequest().body("Le utilisateur existe déjà");
+            return ResponseEntity.badRequest().body("L'utilisateur existe déjà");
         }
         credential.setMdpHash(passwordEncoder.encode(credential.getMdpHash()));
         return ResponseEntity.ok(userRepository.save(credential));
     }
 
+    @Override
     public ResponseEntity<?> login(Utilisateur credential) {
         try {
             Authentication authentication = authenticationManager.authenticate(

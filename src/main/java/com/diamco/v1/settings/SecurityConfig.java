@@ -42,23 +42,24 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+
                         // accessible à tout le monde
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
 
-                        .requestMatchers("/api/auth/logout").authenticated()
+                        //.requestMatchers("/api/auth/logout").authenticated()
 
                         // accessible uniquement aux CLIENT
-                        .requestMatchers("/api/client/**").hasAnyRole("CLIENT", "ADMIN", "SUPERADMIN")
+                        //.requestMatchers("/api/client/**").hasAnyRole("CLIENT", "ADMIN", "SUPERADMIN")
 
                         // accessible uniquement aux ADMIN
-                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        //.requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
 
                         // accessible uniquement aux SUPERADMIN
-                        .requestMatchers("/api/superadmin/**").hasRole("SUPERADMIN")
+                        //.requestMatchers("/api/superadmin/**").hasRole("SUPERADMIN")
 
                         // accessible uniquement aux TECHNICIEN
-                        .requestMatchers("/api/technicien/**").hasAnyRole("TECHNICIEN", "ADMIN", "SUPERADMIN")
+                        //.requestMatchers("/api/technicien/**").hasAnyRole("TECHNICIEN")
 
                         // toutes les autres routes nécessitent une authentification
                         .anyRequest().authenticated())
