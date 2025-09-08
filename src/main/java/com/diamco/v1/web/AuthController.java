@@ -23,9 +23,9 @@ public class AuthController {
     private final PasswordResetService resetService;
 
     @PostMapping("/register")
-    //@PreAuthorize("permitAll()")
+    // @PreAuthorize("permitAll()")
     public ResponseEntity<?> register(@RequestBody Utilisateur credential) {
-        log.info("AuthController.login()...");
+        log.info("AuthController.register()...");
         return auth.register(credential);
     }
 
