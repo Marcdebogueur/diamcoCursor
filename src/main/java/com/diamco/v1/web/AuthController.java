@@ -44,12 +44,6 @@ public class AuthController {
         return auth.login(credential);
     }
 
-    @PostMapping("/forgot")
-    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
-        resetService.sendResetCode(email);
-        return ResponseEntity.ok(Map.of("message", "Code envoyé sur votre email"));
-    }
-
     @PostMapping("/logout")
     //@PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {

@@ -47,27 +47,22 @@ public class SecurityConfig {
     public SecurityFilterChain SecurityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                // ⚠️ ORDRE IMPORTANT: CORS AVANT authorizeHttpRequests
+                // ORDRE IMPORTANT: CORS AVANT authorizeHttpRequests
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // 🔥 CRITIQUE: OPTIONS doit être EN PREMIER et AVANT tout autre matcher
+                        // CRITIQUE: OPTIONS doit être EN PREMIER et AVANT tout autre matcher
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
 
-                        // 🔓 accès public pour le reset password
-                        //.requestMatchers("/api/auth/password/**").permitAll()
-                        //.requestMatchers("/api/auth/**").permitAll()
+                        // Autoriser l'accès aux routes Swagger
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
-                        // Routes publiques
-                        //.requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/password/forgot").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/password/verify").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/password/reset").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll() //
+                        .requestMatchers(HttpMethod.POST, "/swagger-ui.html").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/auth/test").hasAuthority("TECHNICIEN")//.permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/test").permitAll()
                         .requestMatchers("/api/technicien/**").hasAuthority("TECHNICIEN")
+                        //.requestMatchers("/api/technicien/userprofil/**").hasAuthority("TECHNICIEN")
 
 
                         // Routes authentifiées
@@ -79,40 +74,13 @@ public class SecurityConfig {
 
                         // Tout le reste nécessite une authentification
                         .anyRequest().authenticated())
+                // ✅ Ajout du handler pour les erreurs 403
+                .exceptionHandling(ex -> ex.accessDeniedHandler(new CustomAccessDeniedHandler()))
                 // 🔥 Appliquer JwtFilter seulement sur les routes protégées
                 .addFilterBefore(new JwtFilter(jwtUtils, customUserDetailsService), UsernamePasswordAuthenticationFilter.class)
                 
                 .build();
     }
-
-    // @Bean
-    // public CorsConfigurationSource corsConfigurationSource() {
-    //     CorsConfiguration configuration = new CorsConfiguration();
-        
-    //     // ✅ Permet toutes les origines pour le développement
-    //     configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-    //     // configuration.setAllowedOrigins(Arrays.asList("http://localhost:8081", "exp://172.17.4.82:8081", "http://172.17.4.82:8082/api"));
-
-    //     // ✅ Toutes les méthodes HTTP
-    //     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
-        
-    //     // ✅ Tous les headers
-    //     configuration.setAllowedHeaders(Arrays.asList("*"));
-        
-    //     // ✅ Permet les credentials (important pour JWT)
-    //     configuration.setAllowCredentials(true);
-        
-    //     // ✅ Headers exposés dans les réponses
-    //     configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        
-    //     // ✅ Cache les requêtes preflight pendant 1 heure
-    //     configuration.setMaxAge(3600L);
-        
-    //     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    //     source.registerCorsConfiguration("/**", configuration);
-    //     return source;
-    // }
-
 
 
 
