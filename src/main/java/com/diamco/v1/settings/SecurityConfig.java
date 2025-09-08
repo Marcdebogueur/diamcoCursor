@@ -58,8 +58,16 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll() //
                         .requestMatchers(HttpMethod.POST, "/swagger-ui.html").permitAll()
+                        // Routes publiques
+                        //.requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/password/forgot").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/password/verify").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/password/reset").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/api/auth/test").hasAuthority("TECHNICIEN")//.permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/test").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/test").permitAll()
                         .requestMatchers("/api/technicien/**").hasAuthority("TECHNICIEN")
                         .requestMatchers("/api/client/**").hasAuthority("CLIENT")
