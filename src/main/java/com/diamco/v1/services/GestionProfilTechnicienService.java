@@ -2,15 +2,16 @@ package com.diamco.v1.services;
 
 import com.diamco.v1.entities.Technicien;
 import com.diamco.v1.entities.Utilisateur;
-import com.diamco.v1.entities.dtos.*;
+import com.diamco.v1.entities.dtos.PasswordUpdateDTO;
+import com.diamco.v1.entities.dtos.TechnicienProfilDTO;
+import com.diamco.v1.payload.ApiResponse;
 import com.diamco.v1.repository.UtilisateurRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -21,23 +22,23 @@ public class GestionProfilTechnicienService implements IGestionProfilTechnicien 
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public ResponseEntity<TechnicienProfilDTO> getProfil(String email) {
+    public ResponseEntity<ApiResponse> getProfil(String email) {
         log.info("Recherche du profil pour l'email: {}", email);
 
         Utilisateur user = userRepository.findByEmail(email);
         if (user == null) {
             log.error("Aucun utilisateur trouvé avec l'email: {}", email);
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponse.error(HttpStatus.NOT_FOUND.value(), "Utilisateur non trouvé")
+            );
         }
-
-        log.info("Utilisateur trouvé: {} avec le rôle: {}", user.getEmail(), user.getRole());
 
         if (!(user instanceof Technicien technicien)) {
-            log.error("L'utilisateur {} n'est pas un technicien. Type: {}", email, user.getClass().getSimpleName());
-            return ResponseEntity.badRequest().build();
+            log.error("L'utilisateur {} n'est pas un technicien", email);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Utilisateur n'est pas un technicien")
+            );
         }
-
-        log.info("Création du DTO pour le technicien: {}", technicien.getEmail());
 
         TechnicienProfilDTO dto = new TechnicienProfilDTO();
         dto.setNom(technicien.getNom());
@@ -47,33 +48,45 @@ public class GestionProfilTechnicienService implements IGestionProfilTechnicien 
         dto.setEmail(technicien.getEmail());
         dto.setSpecialite(technicien.getSpecialite());
 
-        return ResponseEntity.ok(dto);
+        log.info("Profil récupéré avec succès pour: {}", technicien.getEmail());
+
+        return ResponseEntity.ok(
+                ApiResponse.success(HttpStatus.OK.value(), "Profil récupéré avec succès", dto)
+        );
     }
 
     @Override
-    public ResponseEntity<?> updatePassword(String email, PasswordUpdateDTO dto) {
+    public ResponseEntity<ApiResponse> updatePassword(String email, PasswordUpdateDTO dto) {
         log.info("Tentative de mise à jour du mot de passe pour: {}", email);
 
         Utilisateur user = userRepository.findByEmail(email);
         if (user == null) {
-            log.error("Aucun utilisateur trouvé avec l'email: {}", email);
-            return ResponseEntity.notFound().build();
+            log.error("Utilisateur introuvable: {}", email);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponse.error(HttpStatus.NOT_FOUND.value(), "Utilisateur non trouvé")
+            );
         }
 
         if (!(user instanceof Technicien technicien)) {
             log.error("L'utilisateur {} n'est pas un technicien", email);
-            return ResponseEntity.badRequest().body("Utilisateur n'est pas un technicien");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Utilisateur n'est pas un technicien")
+            );
         }
 
         if (!passwordEncoder.matches(dto.getAncienMdp(), technicien.getMdpHash())) {
             log.error("Ancien mot de passe incorrect pour: {}", email);
-            return ResponseEntity.badRequest().body("Ancien mot de passe incorrect !");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Ancien mot de passe incorrect")
+            );
         }
 
         technicien.setMdpHash(passwordEncoder.encode(dto.getNouveauMdp()));
         userRepository.save(technicien);
 
         log.info("Mot de passe mis à jour avec succès pour: {}", email);
-        return ResponseEntity.ok(Map.of("message", "Mot de passe mis à jour avec succès !"));
+        return ResponseEntity.ok(
+                ApiResponse.success(HttpStatus.OK.value(), "Mot de passe mis à jour avec succès", null)
+        );
     }
 }

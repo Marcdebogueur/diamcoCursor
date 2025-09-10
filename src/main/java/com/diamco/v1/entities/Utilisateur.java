@@ -1,5 +1,6 @@
 package com.diamco.v1.entities;
 
+import com.diamco.v1.entities.base.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
@@ -24,7 +25,7 @@ import lombok.*;
         @JsonSubTypes.Type(value = Technicien.class, name = "TECHNICIEN"),
         @JsonSubTypes.Type(value = SuperAdmin.class, name = "SUPERADMIN")
 })
-public abstract class Utilisateur {
+public abstract class Utilisateur extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

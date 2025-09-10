@@ -28,27 +28,6 @@ public class PasswordResetService {
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
 
-    //  Générer et envoyer le code
-    /*public void sendResetCode(String email) {
-        System.out.println("Sending reset code to email: " + email);
-        Utilisateur user = userRepository.findByEmail(email);
-        if (user == null) throw new RuntimeException("Email non trouvé");
-
-        String code = String.format("%06d", new Random().nextInt(999999)); // code 6 chiffres
-        PasswordResetToken token = new PasswordResetToken();
-        token.setEmail(email);
-        token.setToken(code);
-        token.setExpiration(LocalDateTime.now().plusMinutes(10)); // expire après 10 min
-        tokenRepository.save(token);
-
-        // Envoyer l’email
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("Code de réinitialisation de mot de passe");
-        message.setText("Votre code de réinitialisation est : " + code + " (valide 10 minutes)");
-        mailSender.send(message);
-    }*/
-
     public void sendResetCode(String email) {
         System.out.println("Sending reset code to email: " + email);
         Utilisateur user = userRepository.findByEmail(email);
@@ -56,7 +35,7 @@ public class PasswordResetService {
             throw new RuntimeException("Email non trouvé");
         }
 
-        String code = String.format("%06d", new Random().nextInt(999999));
+        String code = String.format("%04d", new Random().nextInt(10000));
         PasswordResetToken token = new PasswordResetToken();
         token.setEmail(email);
         token.setToken(code);

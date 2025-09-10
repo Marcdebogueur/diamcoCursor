@@ -62,15 +62,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/test").hasAuthority("TECHNICIEN")//.permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/test").permitAll()
                         .requestMatchers("/api/technicien/**").hasAuthority("TECHNICIEN")
-                        //.requestMatchers("/api/technicien/userprofil/**").hasAuthority("TECHNICIEN")
-
-
-                        // Routes authentifiées
-                        // .requestMatchers("/api/auth/logout").authenticated()
-                        // .requestMatchers("/api/client/**").hasAnyRole("CLIENT", "ADMIN", "SUPERADMIN")
-                        // .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                        // .requestMatchers("/api/superadmin/**").hasRole("SUPERADMIN")
-                        // .requestMatchers("/api/technicien/**").hasAnyRole("TECHNICIEN", "ADMIN", "SUPERADMIN")
+                        .requestMatchers("/api/client/**").hasAuthority("CLIENT")
 
                         // Tout le reste nécessite une authentification
                         .anyRequest().authenticated())
@@ -88,7 +80,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // 🔥 En dev, accepte tout
+        // En dev, accepte tout
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
