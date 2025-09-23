@@ -27,9 +27,9 @@ import lombok.*;
 })
 public abstract class Utilisateur extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    //@Id
+    //@GeneratedValue(strategy = GenerationType.UUID)
+    //private String id;
 
     private String nom;
     private String prenom;

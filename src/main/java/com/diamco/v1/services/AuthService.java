@@ -44,7 +44,7 @@ public class AuthService implements IAuth{
         credential.setMdpHash(passwordEncoder.encode(credential.getMdpHash()));
         Utilisateur savedUser = userRepository.save(credential);
 
-        // ✅ Connexion automatique : mise à jour du flag et génération du token
+        // Connexion automatique : mise à jour du flag et génération du token
         savedUser.setAuthentificated(true);
         userRepository.save(savedUser);
         String token = jwtUtils.generateToken(savedUser);

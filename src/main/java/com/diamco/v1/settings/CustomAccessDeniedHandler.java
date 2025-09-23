@@ -23,7 +23,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         String uri = request.getRequestURI();
         String method = request.getMethod();
 
-        log.error("❌ Accès refusé [403] - Méthode: {} | URI: {} | Raison: {}",
+        log.error(" Accès refusé [403] - Méthode: {} | URI: {} | Raison: {}",
                 method, uri, accessDeniedException.getMessage());
 
         response.sendError(HttpServletResponse.SC_FORBIDDEN,
