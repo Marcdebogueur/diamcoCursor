@@ -33,11 +33,12 @@ public class AuthService implements IAuth{
         Map<String, Object> response = new HashMap<>();
 
         // Vérification si l'utilisateur existe déjà
-        if (userRepository.findByNom(credential.getNom()) != null 
+        if (
+            userRepository.findByTelephone(credential.getTelephone()) != null 
             || userRepository.findByEmail(credential.getEmail()) != null) {
             response.put("status", "error");
-            response.put("message", "L'utilisateur existe déjà");
-            return ResponseEntity.ok(response); // 400
+            response.put("message", "email ou téléphone déjà utilisé");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response); // 400
         }
 
         // Hash du mot de passe et sauvegarde
@@ -50,13 +51,12 @@ public class AuthService implements IAuth{
         String token = jwtUtils.generateToken(savedUser);
 
         // Préparation de la réponse JSON standardisée
-        Map<String, Object> data = new HashMap<>();
-        data.put("token", token);
-        data.put("user", savedUser);
+       
 
         response.put("status", "success");
         response.put("message", "Inscription réussie et utilisateur connecté");
-        response.put("data", data);
+        response.put("token", token);
+        response.put("user", savedUser);
 
         return ResponseEntity.ok(response); // 200
     }

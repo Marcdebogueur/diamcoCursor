@@ -1,6 +1,7 @@
 package com.diamco.v1.web;
 
 import com.diamco.v1.payload.ApiResponse;
+import com.diamco.v1.payload.ResponseApi;
 import com.diamco.v1.services.PasswordResetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,20 +23,28 @@ public class PasswordResetController {
 
 
 
-    // Demander le code
+   
+    // ========================
+    // CONTROLLER : forgotPassword
+    // ========================
     @PostMapping("/forgot")
-    public ResponseEntity<ApiResponse> forgotPassword(@RequestParam String email) {
+    public ResponseEntity<ResponseApi> forgotPassword(@RequestParam String email) {
         try {
-            resetService.sendResetCode(email);
-            return ResponseEntity.ok(
-                    ApiResponse.success(HttpStatus.OK.value(), "Code envoyé sur votre email", null)
-            );
+            // On appelle le service qui envoie le code
+            ResponseApi response = resetService.sendResetCode(email);
+            System.out.println("Réponse envoyée: " + response.getMessage());
+
+            // Retourne la réponse directement (succès ou erreur déjà gérée)
+            return ResponseEntity.status(response.getStatus()).body(response);
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage())
+            // Gestion d'erreurs non prévues
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ResponseApi.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Une erreur inattendue est survenue")
             );
         }
     }
+
 
     // Vérifier le code
     @PostMapping("/verify")
