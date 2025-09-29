@@ -42,25 +42,27 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // accessible à tout le monde
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
                         .requestMatchers("/api/auth/logout").authenticated()
 
+                        // Dashboard réservé ADMIN et SUPERADMIN
+                        .requestMatchers("/api/dash/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
+
                         // accessible uniquement aux CLIENT
-                        .requestMatchers("/api/client/**").hasAnyRole("CLIENT", "ADMIN", "SUPERADMIN")
+                        .requestMatchers("/api/client/**").hasAnyAuthority("CLIENT", "ADMIN", "SUPERADMIN")
 
                         // accessible uniquement aux ADMIN
-                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
 
                         // accessible uniquement aux SUPERADMIN
-                        .requestMatchers("/api/superadmin/**").hasRole("SUPERADMIN")
+                        .requestMatchers("/api/superadmin/**").hasAuthority("SUPERADMIN")
 
                         // accessible uniquement aux TECHNICIEN
-                        .requestMatchers("/api/technicien/**").hasAnyRole("TECHNICIEN", "ADMIN", "SUPERADMIN")
+                        .requestMatchers("/api/technicien/**").hasAnyAuthority("TECHNICIEN", "ADMIN", "SUPERADMIN")
 
-                        // toutes les autres routes nécessitent une authentification
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtFilter(jwtUtils, customUserDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .build();

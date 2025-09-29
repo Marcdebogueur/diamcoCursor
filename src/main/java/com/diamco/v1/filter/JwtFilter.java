@@ -38,13 +38,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
-            //nom = jwtUtils.extractUserName(jwt);
             try {
                 nom = jwtUtils.extractUserName(jwt);
             } catch (io.jsonwebtoken.ExpiredJwtException e) {
-                String expiredEmail = e.getClaims().get("email", String.class);
-                if (expiredEmail != null) {
-                    Utilisateur user = utilisateurRepository.findByEmail(expiredEmail);
+                String expiredSubject = e.getClaims().getSubject();
+                if (expiredSubject != null) {
+                    Utilisateur user = utilisateurRepository.findByEmail(expiredSubject);
                     if (user != null && user.isAuthentificated()) {
                         user.setAuthentificated(false);
                         utilisateurRepository.save(user);
